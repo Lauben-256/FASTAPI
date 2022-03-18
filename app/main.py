@@ -4,19 +4,26 @@
 from ast import Str
 from email.charset import BASE64
 import time
+from sqlalchemy.orm import Session
 from lib2to3.pytree import Base
 from turtle import title
 from typing import Optional
 from xml.dom.minidom import Identified
-from fastapi import Body, FastAPI, Response, status, HTTPException
+from fastapi import Body, FastAPI, Response, status, HTTPException, Depends
 from pydantic import BaseModel
 from random import randrange
 import psycopg2
 from psycopg2.extras import RealDictCursor
+from . import models
+from .database import engine, get_db 
+
+
+# Create all our models
+models.Base.metadata.create_all(bind=engine)
+
 
 # Create an instance of fastapi
 app = FastAPI()
-
 
 # class defining what a post should look like
 class Post(BaseModel):
@@ -58,21 +65,37 @@ def find_index_post(id):
 def root():
     return {"message": "welcome to my api"}
 
+# TEST Path Operation
+@app.get("/sqlalchemy")
+def test_posts(db: Session = Depends(get_db)):
+    posts = db.query(models.Post).all() # Returns a regular SQL Statement
+    return {"data": posts}
+
+
 # RETRIEVE USER'S POSTS
 @app.get("/posts") # Get User posts
-def get_posts():
-    cursor.execute(""" SELECT * FROM posts """)
-    posts = cursor.fetchall()
-    print(posts)
+def get_posts(db: Session = Depends(get_db)):
+    # cursor.execute(""" SELECT * FROM posts """)
+    # posts = cursor.fetchall()
+    # print(posts)
+
+    posts = db.query(models.Post).all()
     return {"data": posts}
 
 # CREATE POSTS
 @app.post("/posts", status_code=status.HTTP_201_CREATED)
-def create_post(post: Post): # Reference the Post pydantic Model
+def create_post(post: Post, db: Session = Depends(get_db)): # Reference the Post pydantic Model
     # Inserting a new post within our database
-    cursor.execute(""" INSERT INTO posts (title, content, published) VALUES (%s, %s, %s) RETURNING * """, (post.title, post.content, post.published))
-    new_post = cursor.fetchone()
-    conn.commit()
+    # cursor.execute(""" INSERT INTO posts (title, content, published) VALUES (%s, %s, %s) RETURNING * """, (post.title, post.content, post.published))
+    # new_post = cursor.fetchone()
+    # conn.commit()
+
+    # print(**post.dict()) # Unpack a dictionary
+    # new_post = models.Post(title=post.title, content=post.content, published=post.published)
+    new_post = models.Post(**post.dict()) # Unpack the dictionary
+    db.add(new_post) # Add the new post to the database
+    db.commit() # Save it or store it to the database
+    db.refresh(new_post) # Retrieve new post and store it in a new variable new_post
     return {"data": new_post}
 
 # Define the data that we expect from the user
@@ -80,10 +103,13 @@ def create_post(post: Post): # Reference the Post pydantic Model
 
 # GET A SPECIFIC POST
 @app.get("/posts/{id}") # {id} is a path parameter
-def get_post(id: int, response: Response): # 'int' to convert the path paramenter into an integer / Validated into an integer
+def get_post(id: int, db: Session = Depends(get_db)): # 'int' to convert the path paramenter into an integer / Validated into an integer
     # post = find_post(id)
-    cursor.execute(""" SELECT * FROM posts WHERE id = %s""", (str(id),))
-    post = cursor.fetchone()
+    # cursor.execute(""" SELECT * FROM posts WHERE id = %s""", (str(id),))
+    # post = cursor.fetchone()
+
+    post = db.query(models.Post).filter(models.Post.id == id).first()
+    # print(post)
     if not post:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"post with id: {id} was not found")
     return {"post_detail": post}
