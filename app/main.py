@@ -4,19 +4,21 @@
 from ast import Str
 from email.charset import BASE64
 import time
+from . import utils
 from sqlalchemy.orm import Session
 from lib2to3.pytree import Base
+# from passlib.context import CryptContext
 from turtle import title
-from typing import Optional
+from typing import Optional, List
 from xml.dom.minidom import Identified
 from fastapi import Body, FastAPI, Response, status, HTTPException, Depends
-from pydantic import BaseModel
 from random import randrange
 import psycopg2
 from psycopg2.extras import RealDictCursor
-from . import models
+from . import models, schemas
 from .database import engine, get_db 
 
+# pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 # Create all our models
 models.Base.metadata.create_all(bind=engine)
@@ -25,13 +27,6 @@ models.Base.metadata.create_all(bind=engine)
 # Create an instance of fastapi
 app = FastAPI()
 
-# class defining what a post should look like
-class Post(BaseModel): # This is referred to as a schema
-    # id: int
-    title: str
-    content: str
-    published: bool = True # field with a Default Value
-    # rating: Optional[int] = None # Optional Value with an integer type with a value equals None
 
 # Setup Database Connection
 while True:
@@ -66,25 +61,25 @@ def root():
     return {"message": "welcome to my api"}
 
 # TEST Path Operation
-@app.get("/sqlalchemy")
-def test_posts(db: Session = Depends(get_db)):
-    posts = db.query(models.Post).all() # Returns a regular SQL Statement
-    return {"data": posts}
+# @app.get("/sqlalchemy")
+# def test_posts(db: Session = Depends(get_db)):
+#     posts = db.query(models.Post).all() # Returns a regular SQL Statement
+#     return {"data": posts}
 
 
 # RETRIEVE USER'S POSTS
-@app.get("/posts") # Get User posts
+@app.get("/posts", response_model=List[schemas.Post]) # Get User posts
 def get_posts(db: Session = Depends(get_db)):
     # cursor.execute(""" SELECT * FROM posts """)
     # posts = cursor.fetchall()
     # print(posts)
 
     posts = db.query(models.Post).all()
-    return {"data": posts}
+    return posts
 
 # CREATE POSTS
-@app.post("/posts", status_code=status.HTTP_201_CREATED)
-def create_post(post: Post, db: Session = Depends(get_db)): # Reference the Post pydantic Model
+@app.post("/posts", status_code=status.HTTP_201_CREATED, response_model= schemas.Post)
+def create_post(post: schemas.PostCreate, db: Session = Depends(get_db)): # Reference the Post pydantic Model
     # Inserting a new post within our database
     # cursor.execute(""" INSERT INTO posts (title, content, published) VALUES (%s, %s, %s) RETURNING * """, (post.title, post.content, post.published))
     # new_post = cursor.fetchone()
@@ -96,7 +91,7 @@ def create_post(post: Post, db: Session = Depends(get_db)): # Reference the Post
     db.add(new_post) # Add the new post to the database
     db.commit() # Save it or store it to the database
     db.refresh(new_post) # Retrieve new post and store it in a new variable new_post
-    return {"data": new_post}
+    return new_post
 
 # Define the data that we expect from the user
 # title str, content str
@@ -112,7 +107,7 @@ def get_post(id: int, db: Session = Depends(get_db)): # 'int' to convert the pat
     # print(post)
     if not post:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"post with id: {id} was not found")
-    return {"post_detail": post}
+    return post
 
 # DELETE A POST
 @app.delete("/posts/{id}", status_code=status.HTTP_204_NO_CONTENT)
@@ -131,16 +126,45 @@ def delete_post(id: int, db: Session = Depends(get_db)):
     
 
 # UPDATE A POST
-@app.put("/posts/{id}")
-def update_post(id: int, updated_post: Post, db: Session = Depends(get_db)):
+@app.put("/posts/{id}", response_model=schemas.Post)
+def update_post(id: int, updated_post: schemas.PostCreate, db: Session = Depends(get_db)):
     # cursor.execute(""" UPDATE posts SET title = %s, content = %s, published = %s WHERE id = %s RETURNING *""", (post.title, post.content, post.published, (str(id),)))
     # updated_post = cursor.fetchone()
     # conn.commit()
 
     post_query = db.query(models.Post).filter(models.Post.id == id)
     post = post_query.first()
-    if Post == None:
+    if post == None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"post with id {id} does not exist")
     post_query.update(updated_post.dict(), synchronize_session=False)
     db.commit()
-    return {'data': post_query.first()}
+    return post_query.first()
+
+
+""" USERS' PATH OPERATION """
+
+@app.post("/users", status_code=status.HTTP_201_CREATED, response_model=schemas.UserOut)
+def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
+
+    # Hash the password - user.password 
+    # hashed_password = pwd_context.hash(user.password)
+    hashed_password = utils.hash(user.password)
+    user.password = hashed_password
+
+    new_user = models.User(**user.dict()) # Unpack the dictionary
+    db.add(new_user) # Add the new post to the database
+    db.commit() # Save it or store it to the database
+    db.refresh(new_user) # Retrieve new post and store it in a new variable new_post
+    return new_user
+
+
+""" FETCH USER """
+# Get a specific user 
+@app.get('/users/{id}', response_model=schemas.UserOut)
+def get_user(id: int, db: Session = Depends(get_db)):
+    user = db.query(models.User).filter(models.User.id == id).first()
+
+    if not user:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"User with id: {id} was not found.")
+
+    return user 
