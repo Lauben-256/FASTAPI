@@ -1,7 +1,9 @@
 import email
 from lib2to3.pytree import Base
+from typing import Optional
 from pydantic import BaseModel, EmailStr
 from datetime import datetime
+from typing import Optional 
 
 # class defining what a post should look like
 class Post(BaseModel): # This is referred to as a schema
@@ -68,3 +70,11 @@ class UserLogin(BaseModel):
     email: EmailStr 
     password: str 
 
+""" CREATE AND VERITY TOKENS """
+class Token(BaseModel):
+    access_token: str 
+    token_type: str 
+
+
+class TokenData(BaseModel):
+    id: Optional[str] = None
