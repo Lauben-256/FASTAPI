@@ -1,7 +1,7 @@
 from curses.ascii import HT
 from app import oauth2
 from .. import models, schemas, oauth2 
-from typing import List
+from typing import List, Optional 
 from fastapi import APIRouter, Body, FastAPI, Response, status, HTTPException, Depends
 from sqlalchemy.orm import Session
 from ..database import engine, get_db
@@ -13,12 +13,13 @@ router = APIRouter(
 
 # GET POSTS
 @router.get("/", response_model=List[schemas.Post]) # Get User posts
-def get_posts(db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user)):
+def get_posts(db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user), limit:int = 10, skip: int = 0, search: Optional[str] = ""):
     # cursor.execute(""" SELECT * FROM posts """)
     # posts = cursor.fetchall()
     # print(posts)
 
-    posts = db.query(models.Post).all()
+    print(search)
+    posts = db.query(models.Post).filter(models.Post.title.contains(search)).limit(limit).offset(skip).all()
     # posts = db.query(models.Post).filter(models.Post.owner_id == current_user.id).all() #Get posts only for the logged in user 
 
     return posts
@@ -45,7 +46,7 @@ def create_post(post: schemas.PostCreate, db: Session = Depends(get_db), current
 # title str, content str
 
 # GET A SPECIFIC POST
-@router.get("/{id}") # {id} is a path parameter
+@router.get("/{id}", response_model=schemas.Post) # {id} is a path parameter
 def get_post(id: int, db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user)): # 'int' to convert the path paramenter into an integer / Validated into an integer
     # post = find_post(id)
     # cursor.execute(""" SELECT * FROM posts WHERE id = %s""", (str(id),))

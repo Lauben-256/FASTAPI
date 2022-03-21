@@ -40,6 +40,13 @@ class PostCreate(PostBase):
 
 
 """ DEFININING RESPONSES """
+class UserOut(BaseModel): # User Schema 
+    id: int
+    email: EmailStr 
+    created_at: datetime
+
+    class Config:
+        orm_mode = True
 
 class Post(PostBase):
     id: int
@@ -47,7 +54,8 @@ class Post(PostBase):
     # content: str 
     # published: bool
     created_at: datetime 
-    owner_id: int
+    owner_id: int 
+    owner: UserOut # Return a pydantic model UserOut 
 
     class Config:
         orm_mode = True
@@ -58,14 +66,6 @@ class Post(PostBase):
 class UserCreate(BaseModel):
     email: EmailStr 
     password: str 
-
-class UserOut(BaseModel):
-    id: int
-    email: EmailStr 
-    created_at: datetime
-
-    class Config:
-        orm_mode = True
 
 class UserLogin(BaseModel):
     email: EmailStr 

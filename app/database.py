@@ -1,7 +1,10 @@
 from sre_constants import AT_UNI_BOUNDARY
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import sessionmaker 
+import psycopg2
+from psycopg2.extras import RealDictCursor
+import time
 
 # SQLALCHEMY_DATABASE_URL = "sqlite:///./sql_app.db"
 
@@ -31,3 +34,16 @@ def get_db(): # Call this function everytime we get a call to our API endpoints.
         yield db
     finally:
         db.close()
+
+
+# Setup Database Connection
+# while True:
+#     try: 
+#         conn = psycopg2.connect(host='localhost', database='fastapi', user='postgres', password='Lloverusatumu3', cursor_factory=RealDictCursor)
+#         cursor = conn.cursor()
+#         print("Database connection was successful!")
+#         break
+#     except Exception as error:
+#         print("Database Connection Failed!")
+#         print("Error: ", error)
+#         time.sleep(2)
