@@ -4,14 +4,17 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker 
 import psycopg2
 from psycopg2.extras import RealDictCursor
-import time
+import time 
+from .config import settings
 
 # SQLALCHEMY_DATABASE_URL = "sqlite:///./sql_app.db"
 
 # SQLALCHEMY_DATABASE_URL = 'postgressql://<username>:<password>@<ip-address/hostname>/<database_name>'
 # SQLALCHEMY_DATABASE_URL = "postgresql://user:password@postgresserver/db"
 
-SQLALCHEMY_DATABASE_URL = "postgresql://postgres:Lloverusatumu3@localhost/fastapi"
+SQLALCHEMY_DATABASE_URL = f"postgresql://{settings.database_username}:{settings.database_password}@{settings.database_hostname}:{settings.database_port}/{settings.database_name}" 
+
+
 
 # Create an engine that enables sqlalchemy connect to a database, postgres in this case.
 # engine = create_engine(
