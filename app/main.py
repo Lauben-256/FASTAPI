@@ -2,6 +2,8 @@
 
 # Import the fast api library
 from ast import Str
+
+from fastapi.middleware.cors import CORSMiddleware
 from email.charset import BASE64
 from multiprocessing import AuthenticationError
 from . import utils
@@ -16,11 +18,21 @@ from .routers import post, user, auth, vote
 
 
 # Create all our models
-models.Base.metadata.create_all(bind=engine)
+# models.Base.metadata.create_all(bind=engine)
 
 
 # Create an instance of fastapi
 app = FastAPI()
+
+origins = ["*"]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 app.include_router(post.router) # Include all posts routes 
