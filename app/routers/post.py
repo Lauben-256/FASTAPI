@@ -4,6 +4,7 @@ from .. import models, schemas, oauth2
 from typing import List, Optional 
 from fastapi import APIRouter, Body, FastAPI, Response, status, HTTPException, Depends
 from sqlalchemy.orm import Session
+from sqlalchemy import func # Give us access to functions like count()
 from ..database import engine, get_db
 
 router = APIRouter(
@@ -12,15 +13,19 @@ router = APIRouter(
 )
 
 # GET POSTS
-@router.get("/", response_model=List[schemas.Post]) # Get User posts
+# @router.get("/", response_model=List[schemas.Post]) # Get User posts
+@router.get("/", response_model=List[schemas.PostOut]) # Get User posts
 def get_posts(db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user), limit:int = 10, skip: int = 0, search: Optional[str] = ""):
     # cursor.execute(""" SELECT * FROM posts """)
     # posts = cursor.fetchall()
     # print(posts)
 
-    print(search)
-    posts = db.query(models.Post).filter(models.Post.title.contains(search)).limit(limit).offset(skip).all()
+    # print(search)
+    # posts = db.query(models.Post).filter(models.Post.title.contains(search)).limit(limit).offset(skip).all()
     # posts = db.query(models.Post).filter(models.Post.owner_id == current_user.id).all() #Get posts only for the logged in user 
+
+    posts = db.query(models.Post, func.count(models.Vote.post_id).label("votes")).join(models.Vote, models.Vote.post_id == models.Post.id, isouter=True).group_by(models.Post.id).filter(models.Post.title.contains(search)).limit(limit).offset(skip).all()
+    # print(results)
 
     return posts
 
@@ -46,13 +51,14 @@ def create_post(post: schemas.PostCreate, db: Session = Depends(get_db), current
 # title str, content str
 
 # GET A SPECIFIC POST
-@router.get("/{id}", response_model=schemas.Post) # {id} is a path parameter
+@router.get("/{id}", response_model=schemas.PostOut) # {id} is a path parameter
 def get_post(id: int, db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user)): # 'int' to convert the path paramenter into an integer / Validated into an integer
     # post = find_post(id)
     # cursor.execute(""" SELECT * FROM posts WHERE id = %s""", (str(id),))
     # post = cursor.fetchone()
 
-    post = db.query(models.Post).filter(models.Post.id == id).first()
+    # post = db.query(models.Post).filter(models.Post.id == id).first() 
+    post = db.query(models.Post, func.count(models.Vote.post_id).label("votes")).join(models.Vote, models.Vote.post_id == models.Post.id, isouter=True).group_by(models.Post.id).filter(models.Post.id == id).first()
     # print(post)
     if not post:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"post with id: {id} was not found")

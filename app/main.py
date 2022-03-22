@@ -11,7 +11,7 @@ from xml.dom.minidom import Identified
 from fastapi import FastAPI
 from . import models
 from .database import engine
-from .routers import post, user, auth 
+from .routers import post, user, auth, vote 
 
 
 
@@ -26,6 +26,7 @@ app = FastAPI()
 app.include_router(post.router) # Include all posts routes 
 app.include_router(user.router) # Include all posts routes 
 app.include_router(auth.router) # Include all posts routes 
+app.include_router(vote.router) # Include all posts routes 
 
 # PATH operation
 @app.get("/")

@@ -4,6 +4,7 @@ from typing import Optional
 from pydantic import BaseModel, EmailStr
 from datetime import datetime
 from typing import Optional 
+from pydantic.types import conint 
 
 # class defining what a post should look like
 class Post(BaseModel): # This is referred to as a schema
@@ -79,3 +80,15 @@ class Token(BaseModel):
 
 class TokenData(BaseModel):
     id: Optional[str] = None
+
+
+""" VOTE SCHEMA """
+
+class Vote(BaseModel):
+    post_id: int 
+    dir: conint(le=1)
+
+
+class PostOut(BaseModel):
+    Post: Post 
+    votes: int 
