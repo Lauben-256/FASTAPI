@@ -43,7 +43,7 @@ app.include_router(vote.router) # Include all posts routes
 # PATH operation
 @app.get("/")
 def root():
-    return {"message": "welcome to my api"}
+    return {"message": "welcome to Lauben's API"}
 
 # TEST Path Operation
 # @app.get("/sqlalchemy")
