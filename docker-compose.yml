@@ -1,0 +1,28 @@
+version: "3" # docker version
+services: # Just a container
+      fastapi: # Container or Service name
+          build: . # Build an image for us if it doesn't exist
+          ports:
+              - 8000:8000 #<port on localhost>:<port on container>
+          # env_file: 
+          #     - ./.env 
+          environment: 
+              - DATABASE_HOSTNAME=postgres # Resolves to the IP Address of container postgres on line 19
+              - DATABASE_PORT=5432
+              - DATABASE_PASSWORD=Lloverusatumu3
+              - DATABASE_NAME=fastapi 
+              - DATABASE_USERNAME=postgres 
+              - SECRET_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5cswt
+              - ALGORITHM=HS256
+              - ACCESS_TOKEN_EXPIRE_MINUTES=120
+
+      postgres:
+          image: postgres
+          environment:
+              - POSTGRES_PASSWORD=Lloverusatumu3 
+              - POSTGRES_DB=fastapi 
+          volumes:
+              - postgres-db:/var/lib/postgresql/data # Path in the container that postgres is going to write to. 
+
+volumes:
+            postgres-db:
