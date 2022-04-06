@@ -1,0 +1,19 @@
+name: Build and Deploy Code # Workflow name 
+
+on: [push, pull_request] # What should trigger our workflow to run | Run on all branches 
+  # push: # Specify the branch that should run when you push or pull 
+  #   branches:
+  #     - "main"
+  # pull_request: 
+  #   branches:
+  #     - "test_branch"
+
+jobs: # Create a job. A job is a set of steps that execute on the same runner 
+  job1:
+    runs-on: ubuntu-18.04 # Machine on which the job will run on 
+    # Provide a list of steps 
+    steps: 
+      - name: pulling git repo 
+      - uses: actions/checkout@v3 # Actual command to run 
+      - name: say hi to lauben 
+        run: echo "Lauben" # Run a command e.g echo "Lauben"
