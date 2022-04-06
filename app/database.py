@@ -32,7 +32,7 @@ Base = declarative_base()
 # Dependency
 def get_db(): # Call this function everytime we get a call to our API endpoints.
     # Everytime we get a request, we get a session
-    db = SessionLocal()
+    db = SessionLocal() # Allows to make queries using SQLAlchemy
     try:
         yield db
     finally:
