@@ -25,3 +25,8 @@ jobs: # Create a job. A job is a set of steps that execute on the same runner
         run: python -m pip install --upgrade pip 
       - name: Install all dependencies 
         run: pip install -r requirements.txt 
+      # Run pytest 
+      - name: test with pytest 
+        run: | # Pipe if you want to run a list of commands 
+          pip install pytest 
+          pytest 
