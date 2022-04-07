@@ -9,7 +9,8 @@ on: [push, pull_request] # What should trigger our workflow to run | Run on all 
   #     - "test_branch"
 
 jobs: # Create a job. A job is a set of steps that execute on the same runner 
-  job1:env:
+  job1:
+    env:
       DATABASE_HOSTNAME: localhost
       DATABASE_PORT: 5432
       DATABASE_PASSWORD: Lloverusatumu3
