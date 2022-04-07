@@ -84,4 +84,4 @@ jobs: # Create a job. A job is a set of steps that execute on the same runner
 
     steps: 
       - name: deploying stuff
-      - run: echo "Going to build stuff"
+        run: echo "Going to build stuff"
