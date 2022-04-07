@@ -15,5 +15,13 @@ jobs: # Create a job. A job is a set of steps that execute on the same runner
     steps: 
       - name: pulling git repo 
         uses: actions/checkout@v3 # Actual command to run 
-      - name: say hi to lauben 
-        run: echo "Lauben" # Run a command e.g echo "Lauben"
+      # - name: say hi to lauben 
+      #   run: echo "Lauben" # Run a command e.g echo "Lauben" 
+      - name: Install python version 3.10.0 
+        uses: actions/setup-python@v3 
+        with: 
+          python-version: '3.10.0'
+      - name: update pip 
+        uses: python -m pip install --upgrade pip 
+      - name: Install all dependencies 
+        run: pip install -r requirements.txt 
