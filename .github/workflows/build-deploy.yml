@@ -10,15 +10,17 @@ on: [push, pull_request] # What should trigger our workflow to run | Run on all 
 
 jobs: # Create a job. A job is a set of steps that execute on the same runner 
   job1:
+    environment: 
+      name: Testing # Environment for secrets 
     env:
-      DATABASE_HOSTNAME: localhost
-      DATABASE_PORT: 5432
-      DATABASE_PASSWORD: Lloverusatumu3
-      DATABASE_NAME: fastapi 
-      DATABASE_USERNAME: postgres 
-      SECRET_KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5cswt
-      ALGORITHM: HS256
-      ACCESS_TOKEN_EXPIRE_MINUTES: 120
+      DATABASE_HOSTNAME: ${{secrets.DATABASE_HOSTNAME}}
+      DATABASE_PORT: ${{secrets.DATABASE_PORT}}
+      DATABASE_PASSWORD: ${{secrets.DATABASE_PASSWORD}}
+      DATABASE_NAME: ${{secrets.DATABASE_NAME}}
+      DATABASE_USERNAME: ${{secrets.DATABASE_USERNAME}} 
+      SECRET_KEY: ${{secrets.SECRET_KEY}}
+      ALGORITHM: ${{secrets.ALGORITHM}}
+      ACCESS_TOKEN_EXPIRE_MINUTES: ${{secrets.ACCESS_TOKEN_EXPIRE_MINUTES}}
     runs-on: ubuntu-18.04 # Machine on which the job will run on 
     # Provide a list of steps 
     steps: 
