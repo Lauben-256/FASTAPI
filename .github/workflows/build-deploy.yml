@@ -84,4 +84,5 @@ jobs: # Create a job. A job is a set of steps that execute on the same runner
 
     steps: 
       - name: deploying stuff
+        uses: appleboy/ssh-action@master
         run: echo "Going to build great stuff"
