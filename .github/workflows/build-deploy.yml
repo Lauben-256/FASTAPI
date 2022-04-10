@@ -82,7 +82,7 @@ jobs: # Create a job. A job is a set of steps that execute on the same runner
     runs-on: ubuntu-18.04
     needs: [build] # Deploy job to run only after the build job has run first
 
-    steps: 
-      - name: deploying stuff
-        uses: appleboy/ssh-action@master
-        run: echo "Going to build great stuff"
+    steps:
+      - name: deploying stuff 
+        run: echo "Testing stuff."
+      
