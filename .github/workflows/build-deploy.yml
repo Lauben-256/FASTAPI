@@ -79,10 +79,18 @@ jobs: # Create a job. A job is a set of steps that execute on the same runner
       - name: push changes to production 
 
   deploy:
-    runs-on: ubuntu-18.04
-    needs: [build] # Deploy job to run only after the build job has run first
+    runs-on: ubuntu-latest
+    needs: [build]
 
     steps:
-      - name: deploying stuff 
-      - run: echo "Testing stuff."
+      - name: deploy to ubuntu server
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{secrets.PROD_HOST}}
+          username: ${{secrets.PROD_USERNAME}}
+          password: ${{secrets.PROD_PASSWORD}}
+          script: |
+            cd app/src
+            git pull
+            echo ${{secrets.PROD_PASSWORD}} | sudo -S systemctl restart api
       
