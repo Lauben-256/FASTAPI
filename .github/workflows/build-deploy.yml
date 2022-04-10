@@ -80,7 +80,7 @@ jobs: # Create a job. A job is a set of steps that execute on the same runner
 
   deploy:
     runs-on: ubuntu-18.04
-    needs: [build] # Deploy job to run only after the build job has run 
+    needs: [build] # Deploy job to run only after the build job has run first
 
     steps: 
       - name: deploying stuff
