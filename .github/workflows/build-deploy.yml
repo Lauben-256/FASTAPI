@@ -77,12 +77,4 @@ jobs: # Create a job. A job is a set of steps that execute on the same runner
           cache-from: type=registry,ref=${{ secrets.DOCKER_HUB_USERNAME }}/fastapi:buildcache
           cache-to: type=registry,ref=${{ secrets.DOCKER_HUB_USERNAME }}/fastapi:buildcache,mode=max
       - name: push changes to production 
-
-  # deploy:
-  #   runs-on: ubuntu-18.04 # Machine on which the job will run on 
-  #   needs: [build]
-  #   # Provide a list of steps 
-  #   steps: 
-  #     - name: deploying stuff 
-  #       run: echo "going to deploy some stuff" 
       
