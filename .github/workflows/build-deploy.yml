@@ -81,6 +81,8 @@ jobs: # Create a job. A job is a set of steps that execute on the same runner
   deploy:
     runs-on: ubuntu-18.04 # Machine on which the job will run on 
     needs: [build]
+    environment:
+      - name: production
     # Provide a list of steps 
     steps: 
       - name: deploying stuff 
