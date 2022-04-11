@@ -94,7 +94,7 @@ jobs: # Create a job. A job is a set of steps that execute on the same runner
           script: |
             cd fastapi/src 
             git pull 
-            echo ${{ secrets.PROD_PASSWORD }} | sudo -S systemctl restart lauben-fastapi.service # Handled
+            echo ${{ secrets.PROD_PASSWORD }} | sudo -S systemctl restart lauben-fastapi.service
       # login to our ubuntu 
       # cd /app/src 
       # git pull
