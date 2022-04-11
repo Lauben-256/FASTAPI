@@ -85,6 +85,18 @@ jobs: # Create a job. A job is a set of steps that execute on the same runner
     #   - name: production
     # Provide a list of steps 
     steps: 
-      - name: deploying stuff 
-        run: echo "going to deploy some stuff" 
-      
+      - name: deploying on Ubuntu server
+        uses: appleboy/ssh-action@master
+        run: echo "going to deploy some stuff"
+        with:
+          host: ${{secrets.PROD_HOST}} 
+          username: ${{secrets.PROD_USERNAME}} 
+          password: ${{secrets.PROD_PASSWORD}} 
+          script: |
+            cd fastapi/src 
+            git pull 
+            systemctl restart lauben-fastapi.service
+      # login to our ubuntu 
+      # cd /app/src 
+      # git pull
+      # systemctl restart lauben-fastapi.service
