@@ -57,7 +57,7 @@ def client():
 def test_root(client):
     res = client.get("/")
     print(res.json().get('message'))
-    assert res.json().get('message') == ("welcome to Lauben's API!: Proceed to /docs to perform requests")
+    assert res.json().get('message') == ("welcome to Lauben's API!")
 
 
 def test_create_user(client):
