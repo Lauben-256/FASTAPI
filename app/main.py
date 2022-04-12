@@ -17,7 +17,7 @@ from .routers import post, user, auth, vote
 
 
 
-# Create all our models 
+# Create all our models.
 # models.Base.metadata.create_all(bind=engine)
 
 
